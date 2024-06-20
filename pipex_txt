@@ -1,0 +1,10 @@
+gnl on infile
+
+
+split argv[2] argv[3] --> commands
+
+
+split PATH in env : (ex : "/usr/bin/ls")
+execve() a chaque fois pour tester
+
+
