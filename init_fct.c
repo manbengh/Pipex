@@ -6,7 +6,7 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 17:33:50 by manbengh          #+#    #+#             */
-/*   Updated: 2024/06/20 20:38:11 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/24 20:44:34 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,21 @@ void	init_cmd(char **argv, t_pipex *pip)
 	}
 }
 
-void	init_struct(char **argv, t_pipex *pip)
+int	init_struct(char **argv, t_pipex *pip, char **env)
 {
 	pip->inf_cont = NULL;
 	pip->cmd1 = NULL;
 	pip->cmd2 = NULL;
 	pip->path_s = NULL;
 	pip->path = NULL;
+	pip->infile = open(argv[1], O_WRONLY | O_CREAT, 0644);
+	pip->outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (pip->infile < 0 || access(argv[1], R_OK) == -1 || access(argv[4],
+			R_OK) == -1 || pip->outfile < 0)
+		return (ft_printf("Error !\nFile can't be opened\n"), 0);
+	// pip->df = 0;
+	// pip->fd = 0;
+	pip->env = env;
 	init_cmd(argv, pip);
+	return (0);
 }

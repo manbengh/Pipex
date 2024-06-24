@@ -6,38 +6,49 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 18:28:38 by manbengh          #+#    #+#             */
-/*   Updated: 2024/06/20 16:51:23 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/24 20:47:22 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+void	child_process(t_pipex *pip)
+{
+	dup2(pip->outfile, STDOUT_FILENO);
+	execve(pip->path, pip->cmd1, NULL);
+}
+
+void	parent_process(t_pipex *pip)
+{
+	wait(&pip->pid);
+	dup2(pip->infile, STDOUT_FILENO);
+}
+
 int	test_pip(char **argv, t_pipex *pip)
 {
-	int		fd[2];
-	pid_t	pid;
+	int	i;
+	// pid_t	pid;
+	// char	buffer[13];
 
-	(void)*pip;
-	fd[0] = open(argv[1], O_WRONLY | O_CREAT);
-	fd[1] = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC);
-	if (fd < 0 || access(argv[1], R_OK) == -1 || access(argv[4], R_OK) == -1)
-		return (ft_printf("Error !\nFile can't be opened\n"), 0);
-	pid = fork();
-	if (pid == -1)
-		return (ft_printf("Fail fork !\n"));
-	// execute code then
-	if (pid == 0) // child
+	i = -1;
+	(void)*argv;
+	while (++i <= 2)
 	{
-		dup2(fd[1], STDOUT_FILENO);
-		ft_printf("Child !\nOutfile test\n");
+		if (pipe(pip->fd) == -1)
+		{
+			perror("pipe");
+			exit(EXIT_FAILURE);
+		}
+		pip->pid = fork();
+		if (pip->pid == -1)
+			return (ft_printf("Fail fork !\n"));
+		if (pip->pid == 0) // child
+			child_process(pip);
+		if (pip->pid != 0) // paren
+			parent_process(pip);
+		close(pip->outfile);
+		close(pip->infile);
 	}
-	if (pid != 0) // parent
-	{
-		dup2(fd[0], STDOUT_FILENO);
-		ft_printf("Parent !\n");
-	}
-	close(fd[1]);
-	close(fd[0]);
 	return (0);
 }
 
@@ -47,9 +58,22 @@ int	main(int argc, char **argv, char **env)
 
 	if (env != 0 && argc == 5)
 	{
-		init_struct(argv, &pip);
-		// test_pip(argv, &pip);
+		init_struct(argv, &pip, env);
 		find_path(&pip, env);
+		// printf("\nFinal :::: %s\n", pip.path);
+		test_pip(argv, &pip);
 	}
+	else
+		return(ft_printf("Error !\nCheck number of arguments or your env!\n"));
 	return (0);
 }
+
+// int main(int ac, char **av, char **envp)
+// {
+//     (void) ac;
+//     (void) av;
+//     const char *filename = "/usr/bin/grep";
+//     char *const argv[] = {"/usr/bin/grep", "a", NULL};
+    
+//     execve(filename, argv, envp);
+// }
