@@ -6,18 +6,22 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:18:51 by manbengh          #+#    #+#             */
-/*   Updated: 2024/06/24 20:32:27 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/26 21:34:09 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	get_path(char **env, t_pipex *pip, int i)
+char	**get_path(char **env)
 {
-	int	j;
-	int	u = 5;
+	int		j;
+	int		i;
+	int		u;
+	char	**res;
 
+	u = 5;
 	j = 0;
+	i = -1;
 	while (env[++i])
 	{
 		while (env[i][j] == "PATH="[j])
@@ -25,37 +29,36 @@ void	get_path(char **env, t_pipex *pip, int i)
 			j++;
 			if (j == 5 && env[i][u])
 			{
-				pip->path_s = ft_split(&env[i][u], ':');
-				break;
+				res = ft_split(&env[i][u], ':');
+				return (res);
 			}
 		}
 	}
-	// i = 0;
-	// while (pip->path_s[i])
-	// {
-	// 	printf("%s\n", pip->path_s[i]);
-	// 	i++;
-	// }
+	return (NULL);
 }
 
-void	find_path(t_pipex *pip, char **env)
+void	find_path(t_pipex *pip, char **env, int c)
 {
-	int i = 0;
+	int		i;
 	char	*tmp;
+	char	**s_path;
 
-	get_path(env, pip, -1);
-	while (pip->path_s[i] && pip->cmd1)
+	i = 0;
+	s_path = get_path(env);
+	if (!s_path)
+		free_everything(pip);
+	pip->cmd = ft_split(pip->av[c], ' ');
+	while (s_path[i] && pip->cmd)
 	{
-		tmp = ft_strjoin(pip->path_s[i], "/");
-		tmp = ft_strjoin(tmp, pip->cmd1[0]);
+		tmp = ft_strjoin(s_path[i], "/");
+		tmp = ft_strjoin(tmp, pip->cmd[0]);
 		if (access(tmp, F_OK | X_OK) == 0)
 		{
 			pip->path = tmp;
-			// free(tmp);
 			return ;
 		}
 		free(tmp);
 		i++;
 	}
-	perror(pip->cmd1[0]);
+	free_tab(s_path);
 }

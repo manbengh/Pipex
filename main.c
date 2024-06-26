@@ -6,49 +6,64 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 18:28:38 by manbengh          #+#    #+#             */
-/*   Updated: 2024/06/24 20:47:22 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/26 21:27:56 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	child_process(t_pipex *pip)
+int	ft_exec(t_pipex *pip, int c)
 {
-	dup2(pip->outfile, STDOUT_FILENO);
-	execve(pip->path, pip->cmd1, NULL);
-}
-
-void	parent_process(t_pipex *pip)
-{
-	wait(&pip->pid);
-	dup2(pip->infile, STDOUT_FILENO);
-}
-
-int	test_pip(char **argv, t_pipex *pip)
-{
-	int	i;
-	// pid_t	pid;
-	// char	buffer[13];
-
-	i = -1;
-	(void)*argv;
-	while (++i <= 2)
+	find_path(pip, pip->env, c);
+	if (execve(pip->path, pip->cmd, pip->env) < 0)
 	{
-		if (pipe(pip->fd) == -1)
-		{
-			perror("pipe");
-			exit(EXIT_FAILURE);
-		}
-		pip->pid = fork();
-		if (pip->pid == -1)
-			return (ft_printf("Fail fork !\n"));
-		if (pip->pid == 0) // child
-			child_process(pip);
-		if (pip->pid != 0) // paren
-			parent_process(pip);
-		close(pip->outfile);
-		close(pip->infile);
+		free_everything(pip);
+		exit (1);
 	}
+	return (1);
+}
+
+void	child_process1(t_pipex *pip)
+{
+	if (dup2(pip->infile, STDIN_FILENO) < 0)
+		dprintf(2, "1dup2 fail\n");
+	if (dup2(pip->fd[1], STDOUT_FILENO) < 0)
+		dprintf(2, "dup2 fail\n");
+	close_fd(pip);
+	ft_exec(pip, 2);
+}
+
+void	child_process2(t_pipex *pip)
+{
+	if (dup2(pip->fd[0], STDIN_FILENO) < 0)
+		dprintf(2, "child2 dup2 fail\n");
+	if (dup2(pip->outfile, STDOUT_FILENO) < 0)
+		dprintf(2, "1child2 dup2 fail\n");
+	close_fd(pip);
+	ft_exec(pip, 3);
+}
+
+int	pipex(t_pipex *pip)
+{
+	if (pipe(pip->fd) == -1)
+	{
+		close_fd(pip);
+		perror("pipe");
+		exit(EXIT_FAILURE);
+	}
+	pip->pid1 = fork();
+	if (pip->pid1 < 0)
+		return (ft_printf("Failed fork !\n"));
+	if (pip->pid1 == 0) // child 1
+		child_process1(pip);
+	pip->pid2 = fork();
+	if (pip->pid2 < 0)
+		return (ft_printf("Failed fork !\n"));
+	if (pip->pid2 == 0) // child 2
+		child_process2(pip);
+	close_fd(pip);
+	while (wait(NULL) > 0)
+		;
 	return (0);
 }
 
@@ -59,21 +74,9 @@ int	main(int argc, char **argv, char **env)
 	if (env != 0 && argc == 5)
 	{
 		init_struct(argv, &pip, env);
-		find_path(&pip, env);
-		// printf("\nFinal :::: %s\n", pip.path);
-		test_pip(argv, &pip);
+		pipex(&pip);
 	}
 	else
 		return(ft_printf("Error !\nCheck number of arguments or your env!\n"));
 	return (0);
 }
-
-// int main(int ac, char **av, char **envp)
-// {
-//     (void) ac;
-//     (void) av;
-//     const char *filename = "/usr/bin/grep";
-//     char *const argv[] = {"/usr/bin/grep", "a", NULL};
-    
-//     execve(filename, argv, envp);
-// }

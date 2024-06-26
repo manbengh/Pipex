@@ -6,7 +6,7 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 19:53:12 by manbengh          #+#    #+#             */
-/*   Updated: 2024/06/24 20:39:40 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/26 21:26:29 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,33 +18,33 @@
 # include <limits.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <sys/types.h>
+# include <sys/wait.h>
 # include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
-	typedef struct s_pipex
-	{
-		int	fd[2];
-		pid_t	pid;
-		int	infile;
-		int	outfile;
-		char 	**env;
-		char	**inf_cont;
-		char	**path_s;
-		char	*path;
-		char	**cmd1;
-		char	**cmd2;
-	}			t_pipex;
+typedef struct s_pipex
+{
+	int		fd[2];
+	pid_t	pid1;
+	pid_t	pid2;
+	int		infile;
+	int		outfile;
+	char	**env;
+	char	**av;
+	char	**path_s;
+	char	*path;
+	char	**cmd;
+}			t_pipex;
 
+int			pipex(t_pipex *pip);
+int			init_struct(char **argv, t_pipex *pip, char **env);
+char		**get_path(char **env);
+void		find_path(t_pipex *pip, char **env, int c);
+void		child_process1(t_pipex *pip);
+void		child_process2(t_pipex *pip);
+void		free_everything(t_pipex *pip);
 
-
-int			test_pip(char **argv, t_pipex *pip);
-void		init_cmd(char **argv, t_pipex *pip);
-int		init_struct(char **argv, t_pipex *pip, char **env);
-int			ft_strcompa(const char *s1, const char *s2);
-void		get_path(char **env, t_pipex *pip, int i);
-void		find_path(t_pipex *pip, char **env);
-void	child_process(t_pipex *pip);
-void	parent_process(t_pipex *pip);
+void		free_tab(char **tab);
+void		close_fd(t_pipex *pip);
 
 #endif
