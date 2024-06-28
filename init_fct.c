@@ -6,7 +6,7 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 17:33:50 by manbengh          #+#    #+#             */
-/*   Updated: 2024/06/26 21:25:50 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/27 17:05:15 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,9 @@
 
 int	init_struct(char **argv, t_pipex *pip, char **env)
 {
-	pip->path_s = NULL;
 	pip->path = NULL;
-	pip->infile = open(argv[1], O_RDONLY | O_CREAT, 0644);
+	pip->infile = open(argv[1], O_RDONLY, 0777);
 	pip->outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (pip->infile < 0 || access(argv[1], R_OK) == -1 || access(argv[4],
-			R_OK) == -1 || pip->outfile < 0)
-		return (ft_printf("Error !\nFile can't be opened\n"), 0);
 	pip->env = env;
 	pip->av = argv;
 	pip->cmd = NULL;

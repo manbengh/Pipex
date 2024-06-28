@@ -2,6 +2,7 @@ SRC = 	main.c \
 	init_fct.c \
 	path.c \
 	utils.c \
+	exec.c \
 
 
 OBJ = $(SRC:.c=.o)
@@ -10,7 +11,7 @@ CC = cc
 
 NAME = pipex
 
-CFLAGS = -Wall -Werror -Wextra -g
+CFLAGS = -Wall -Werror -Wextra
 
 INC = -Iincludes -I/usr/include -ILibft
 

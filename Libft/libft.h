@@ -6,7 +6,7 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 15:47:39 by manbengh          #+#    #+#             */
-/*   Updated: 2024/05/31 18:38:23 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/27 17:47:49 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ void	ft_putendl_fd(char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
 
 char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	*ft_strjoin(char const *s1, char const *s2);
 char	*fill_line_buffer(int fd, char *char_left, char *buffer);
 char	*set_end_line(char *line_buffer);
 char	*get_next_line(int fd);

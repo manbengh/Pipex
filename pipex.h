@@ -6,7 +6,7 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 19:53:12 by manbengh          #+#    #+#             */
-/*   Updated: 2024/06/26 21:26:29 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/27 17:57:17 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ typedef struct s_pipex
 	int		outfile;
 	char	**env;
 	char	**av;
-	char	**path_s;
 	char	*path;
 	char	**cmd;
 }			t_pipex;
@@ -39,11 +38,12 @@ typedef struct s_pipex
 int			pipex(t_pipex *pip);
 int			init_struct(char **argv, t_pipex *pip, char **env);
 char		**get_path(char **env);
+int			concatene_command(t_pipex *pip, char **s_path);
 void		find_path(t_pipex *pip, char **env, int c);
 void		child_process1(t_pipex *pip);
 void		child_process2(t_pipex *pip);
-void		free_everything(t_pipex *pip);
 
+void		free_everything(t_pipex *pip, char *str);
 void		free_tab(char **tab);
 void		close_fd(t_pipex *pip);
 

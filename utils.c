@@ -6,34 +6,31 @@
 /*   By: manbengh <manbengh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:23:52 by manbengh          #+#    #+#             */
-/*   Updated: 2024/06/26 21:35:03 by manbengh         ###   ########.fr       */
+/*   Updated: 2024/06/27 18:26:52 by manbengh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-int	error_path(char *str, t_pipex *pip)
-{
-	perror(str);
-	free(pip->path);
-	exit (1);
-}
 
 void	free_tab(char **tab)
 {
 	int	i;
 
 	i = 0;
-	while (tab[i] != NULL)
+	if (tab)
 	{
-		free(tab[i]);
-		i++;
+		while (tab[i])
+		{
+			free(tab[i]);
+			i++;
+		}
 	}
 	free(tab);
 }
 
-void	free_everything(t_pipex *pip)
+void	free_everything(t_pipex *pip, char *str)
 {
+	perror(str);
 	if (pip->cmd)
 		free_tab(pip->cmd);
 	if (pip->path)
